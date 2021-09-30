@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "MMDetection Test"
+version = "0.1.0"
+description = "A short description of the project"
+authors = ["gatheluck"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.6.15"
+torch = "^1.9.1"
+torchvision = "^0.10.1"
+hydra-core = "^1.1.1"
+pytorch-lightning = "^1.4.8"
+albumentations = "^1.0.3"
+
+[tool.poetry.dev-dependencies]
+black = "^21.9b0"
+mypy = "^0.910"
+flake8 = "^3.9.2"
+isort = "^5.9.3"
+pytest-cov = "^2.12.1"
+
+[tool.isort]
+profile = "black"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
