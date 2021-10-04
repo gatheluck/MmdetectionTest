@@ -1,0 +1,2 @@
+checkpoint_name: yolov3_d53_fp16_mstrain-608_273e_coco_20210517_213542-4bc34944.pth
+mmdet_config_relative_path: yolo/yolov3_d53_mstrain-608_273e_coco.py
