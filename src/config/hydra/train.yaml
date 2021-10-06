@@ -1,5 +1,4 @@
 defaults:
-  - detector: yolov3
   - override hydra/job_logging: colorlog
   - override hydra/hydra_logging: colorlog
   - _self_
@@ -8,7 +7,6 @@ hydra:
   run:
     dir: outputs/${hydra.job.name}/${now:%Y-%m-%d_%H-%M-%S}
 
-device: cuda
-checkpoint_path: null
-mmdet_config_path: null
-input_image_dir: null
+mmdet_config_path: src/config/mmdetection/train.py
+seed: 123
+no_validate: False
