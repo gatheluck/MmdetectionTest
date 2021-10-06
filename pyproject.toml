@@ -32,7 +32,7 @@ black = "^21.7b0"
 profile = "black"
 
 [[tool.mypy.overrides]]
-module = "imgaug.augmentables.bbs"
+module = "imgaug.*"
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
@@ -40,7 +40,7 @@ module = "mmcv"
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
-module = "mmcv.utils"
+module = "mmcv.*"
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
@@ -48,19 +48,7 @@ module = "mmdet"
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
-module = "mmdet.apis"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "mmdet.datasets"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "mmdet.models"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "mmdet.utils"
+module = "mmdet.*"
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
