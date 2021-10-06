@@ -10,8 +10,6 @@ import logging
 import pathlib
 import sys
 import urllib.request
-from os import path
-from posixpath import basename
 
 # If you use try instead of if, it will raise mypy error,
 # For detail please check following;
