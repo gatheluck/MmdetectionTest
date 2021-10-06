@@ -17,6 +17,8 @@ hydra-colorlog = "^1.1.0"
 mmcv-full = "^1.3.14"
 mmdet = "^2.17.0"
 dvc = {extras = ["gdrive"], version = "^2.7.4"}
+imgaug = "^0.4.0"
+tqdm = "^4.62.3"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.910"
