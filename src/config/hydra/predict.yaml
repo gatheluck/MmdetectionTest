@@ -9,6 +9,7 @@ hydra:
     dir: outputs/${hydra.job.name}/${now:%Y-%m-%d_%H-%M-%S}
 
 device: cuda
-checkpoint_path: null
-mmdet_config_path: null
-input_image_dir: null
+score_threshold: 0.2
+checkpoint_path: ???
+mmdet_config_path: ???
+test_image_dir: ???
