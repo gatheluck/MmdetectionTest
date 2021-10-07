@@ -8,6 +8,7 @@ __pycache__
 .vscode
 .DS_Store
 coverage.xml
-data
-outputs
-weight
+/data
+/models
+/tmp
+/outputs

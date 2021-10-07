@@ -9,10 +9,10 @@ services:
     build: 
       context: ../../
       dockerfile: environments/development/Dockerfile-core
-      shm_size: 12G
       args:
         PYTHON_VERSION: 3.6
         APPLICATION_DIRECTORY: /mmdetection_test
+    shm_size: 24G
     ports:
       - 3001:3001
     stdin_open: true

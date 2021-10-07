@@ -1,3 +1,15 @@
+"""
+
+Run prediction by pretrained MM Detection detector. Detected Bounding
+boxes are overrayed to input images.
+
+Usage:
+    $ python src/scripts/predict.py \
+        mmcv_config_path=${PATH_TO_MMCV_CONFIG} \
+        checkpoint_path=${PATH_TO_CHECKPOINT} \
+        test_image_dir=${PATH_TO_DIR_IMAGES_ARE_PLACED}
+
+"""
 import logging
 import pathlib
 import sys
@@ -12,63 +24,53 @@ else:
 
 import hydra
 from mmdet.apis import inference_detector, init_detector
-from omegaconf.omegaconf import OmegaConf
+from omegaconf.omegaconf import DictConfig, OmegaConf
+
+from src.mmdetection.save import save_as_image
 
 logger = logging.getLogger(__name__)
-
-
-def save_result(
-    detector,
-    image_path,
-    result,
-    score_thr,
-    output_path,
-) -> None:
-    if hasattr(detector, "module"):
-        detector = detector.module
-
-    detector.show_result(
-        image_path,
-        result,
-        score_thr=score_thr,
-        show=False,
-        wait_time=0,
-        win_name="title",
-        bbox_color=(72, 101, 241),
-        text_color=(72, 101, 241),
-        out_file=output_path,
-    )
+logging.basicConfig(level=logging.INFO)
 
 
 @hydra.main(config_path="../config/hydra", config_name="predict")
-def main(cfg) -> None:
+def main(cfg: DictConfig) -> None:
+    """Predict detection result by pretrained detector.
+
+    Args:
+        cfg (DictConfig): A config loaded from yaml and CLI.
+
+    """
     OmegaConf.set_readonly(cfg, True)
     logger.info("\n" + OmegaConf.to_yaml(cfg, resolve=True))
 
     cwd: Final = pathlib.Path(hydra.utils.get_original_cwd())
-    mmdet_config_path: Final = cwd / cfg.mmdet_config_path
+    mmcv_config_path: Final = cwd / cfg.mmcv_config_path
     checkpoint_path: Final = cwd / cfg.checkpoint_path
 
     try:
-        input_image_dir: Final = cwd / cfg.input_image_dir
+        test_image_dir: Final = cwd / cfg.test_image_dir
     except Exception:
-        logger.error("input_image_dir is not specified.")
+        logger.error("`test_image_dir` is not specified.")
         raise ValueError
 
-    detector = init_detector(
-        str(mmdet_config_path), str(checkpoint_path), device=cfg.device
+    detector: Final = init_detector(
+        str(mmcv_config_path), str(checkpoint_path), device=cfg.device
     )
 
     supported_suffix: Final = {".png", ".jpg", ".jpeg"}
-    for input_image_path in input_image_dir.glob("**/*"):
-        if input_image_path.suffix not in supported_suffix:
+    for image_path in test_image_dir.glob("**/*"):
+        if image_path.suffix not in supported_suffix:
             continue
 
-        logger.info(f"predicting `{str(input_image_path)}`")
-        result = inference_detector(detector, str(input_image_path))
-        output_path = "result_" + input_image_path.name
-        save_result(
-            detector, input_image_path, result, score_thr=0.05, output_path=output_path
+        logger.info(f"predicting `{str(image_path)}`")
+        result = inference_detector(detector, str(image_path))
+        output_path = pathlib.Path("result_" + image_path.name)
+        save_as_image(
+            detector,
+            image_path,
+            output_path,
+            result,
+            score_thr=cfg.score_threshold,
         )
 
 
