@@ -11,5 +11,5 @@ hydra:
 device: cuda
 score_threshold: 0.2
 checkpoint_path: ???
-mmdet_config_path: ???
+mmcv_config_path: ???
 test_image_dir: ???

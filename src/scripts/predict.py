@@ -5,7 +5,7 @@ boxes are overrayed to input images.
 
 Usage:
     $ python src/scripts/predict.py \
-        mmdet_config_path=${PATH_TO_MMDET_CONFIG} \
+        mmcv_config_path=${PATH_TO_MMCV_CONFIG} \
         checkpoint_path=${PATH_TO_CHECKPOINT} \
         test_image_dir=${PATH_TO_DIR_IMAGES_ARE_PLACED}
 
@@ -44,7 +44,7 @@ def main(cfg: DictConfig) -> None:
     logger.info("\n" + OmegaConf.to_yaml(cfg, resolve=True))
 
     cwd: Final = pathlib.Path(hydra.utils.get_original_cwd())
-    mmdet_config_path: Final = cwd / cfg.mmdet_config_path
+    mmcv_config_path: Final = cwd / cfg.mmcv_config_path
     checkpoint_path: Final = cwd / cfg.checkpoint_path
 
     try:
@@ -54,7 +54,7 @@ def main(cfg: DictConfig) -> None:
         raise ValueError
 
     detector: Final = init_detector(
-        str(mmdet_config_path), str(checkpoint_path), device=cfg.device
+        str(mmcv_config_path), str(checkpoint_path), device=cfg.device
     )
 
     supported_suffix: Final = {".png", ".jpg", ".jpeg"}
