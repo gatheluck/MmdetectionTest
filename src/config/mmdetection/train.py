@@ -11,7 +11,7 @@ evaluation = dict(interval=1, metric=["bbox"])
 log_config = dict(
     interval=50,
     hooks=[
-        dict(type='TextLoggerHook'),
-        dict(type='TensorboardLoggerHook'),
-    ]
+        dict(type="TextLoggerHook"),
+        dict(type="TensorboardLoggerHook"),
+    ],
 )
