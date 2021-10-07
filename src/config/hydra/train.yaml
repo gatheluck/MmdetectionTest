@@ -7,6 +7,5 @@ hydra:
   run:
     dir: outputs/${hydra.job.name}/${now:%Y-%m-%d_%H-%M-%S}
 
-mmdet_config_path: src/config/mmdetection/train.py
+mmcv_config_path: src/config/mmdetection/train.py
 seed: 123
-no_validate: False
