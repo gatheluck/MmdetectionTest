@@ -8,3 +8,10 @@ _base_ = [
 # runtime settings
 runner = dict(type="EpochBasedRunner", max_epochs=20)
 evaluation = dict(interval=1, metric=["bbox"])
+log_config = dict(
+    interval=50,
+    hooks=[
+        dict(type="TextLoggerHook"),
+        dict(type="TensorboardLoggerHook"),
+    ],
+)

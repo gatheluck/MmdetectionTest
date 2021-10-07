@@ -12,3 +12,30 @@
 
 ### Note
 - If you want to use Python 3.6, `python3.6-dev` is needed  (instead of `python3-dev`) to escape from error of `pycocotools` (`pycocotools/_mask.c:6:10: fatal error: Python.h: No such file or directory`).
+
+## Preparation
+### Dataset
+Python training script placed under `src/scripts/train.py` requires StrawDI dataset and converted annotation to run. Please following the instructions bellow.
+
+- Download StrawDI dataset from [the webpage](https://strawdi.github.io/) and unzip downloaded file (It will create directory `StrawDI_Db1`).
+- Rename the directory `StrawDI_Db1` to `strawdi` and place it under `data`. 
+- Run `src/scripts/convert_annotation.py` to convert StrawDI's original segmentation annotation to detection annotation.
+
+    ```bash
+    % poetry run python src/scripts/convert_annotation.py --data_dir data/strawdi --save_dir tmp
+
+    # Above script will generate three annotation files under `tmp`.
+    % ls tmp
+
+    test.json  train.json  val.json
+    ```
+- Make `annotations` directory under `data/strawdi` and move converted annotations to `data/strawdi/annotations`. 
+    ```bash
+    % mkdir data/strawdi/annotations
+    % mv tmp/*.json data/strawdi/annotations
+    % find data/strawdi  -name "*.json"
+
+    data/strawdi/annotations/test.json
+    data/strawdi/annotations/val.json
+    data/strawdi/annotations/train.json
+    ```
