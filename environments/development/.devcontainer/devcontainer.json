@@ -1,0 +1,10 @@
+{
+    "name": "dev container",
+    "dockerComposeFile": [
+        "../docker-compose.yaml"
+    ],
+    "service": "core",
+    // "remoteUser": "docker",
+    "workspaceFolder": "/mmdetection_test",
+    // "extensions": []
+}
