@@ -1,37 +1,53 @@
-FROM nvidia/cuda:11.0-devel-ubuntu20.04
-SHELL ["/bin/bash", "-c"]
+# https://github.com/open-mmlab/mmdetection/blob/master/docker/Dockerfile
+# base image is refering above offifical Dockerfile by MM Detection.
+#
+# when we use nvidia/cuda:11.0-devel-ubuntu20.04 as base dockerfile,
+# we hit following error:
+# - https://github.com/open-mmlab/mmdetection/issues/1893
+# we also try set FORCE_CUDA https://github.com/open-mmlab/mmdetection/pull/2097 ,
+# it does not work.
 
-ARG PYTHON_VERSION
-ARG APPLICATION_DIRECTORY
-ARG USER_NAME=default
+ARG PYTORCH="1.6.0"
+ARG CUDA="10.1"
+ARG CUDNN="7"
 
-# Without following setting, decoding error will be raised
-ENV LC_ALL=C.UTF-8
-ENV LANG=C.UTF-8
-# Restrict python log
-ENV PYTHONUNBUFFERED=1
-ENV DEBIAN_FRONTEND noninteractive
-ENV PYTHONPATH ${APPLICATION_DIRECTORY}
+FROM pytorch/pytorch:${PYTORCH}-cuda${CUDA}-cudnn${CUDNN}-devel
 
-# Following is needed to install python 3.6, 3.9
-RUN apt update && apt install --no-install-recommends -y software-properties-common 
-RUN add-apt-repository ppa:deadsnakes/ppa
+ENV TORCH_CUDA_ARCH_LIST="6.0 6.1 7.0+PTX"
+ENV TORCH_NVCC_FLAGS="-Xfatbin -compress-all"
+ENV CMAKE_PREFIX_PATH="$(dirname $(which conda))/../"
 
-# Last line is needed for MM Detection 
-RUN apt update && apt install --no-install-recommends -y \
-    git curl ssh openssh-client \
-    python${PYTHON_VERSION} python3-dev python3-pip python-is-python3 \
-    python${PYTHON_VERSION}-dev build-essential libgl1-mesa-dev
-    
-# Following is needed to swtich default python3 version
-# For detail, please check following link
-# https://unix.stackexchange.com/questions/410579/change-the-python3-default-version-in-ubuntu
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python${PYTHON_VERSION} 1 \
-    && update-alternatives --set python3 /usr/bin/python${PYTHON_VERSION} \
-    && pip3 install poetry
+RUN apt-get update \
+    && apt-get install -y ffmpeg libsm6 libxext6 git ninja-build libglib2.0-0 libsm6 libxrender-dev libxext6 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Add user. Without this, following process is executed as admin (This will lead file permission problem.). 
-RUN useradd -ms /bin/sh ${USER_NAME}
-USER ${USER_NAME}
+ENV PYTHONPATH="/home/gatheluck/code/"\
+    PATH="/home/gatheluck/.local/bin:$PATH"\
+    LC_ALL=C.UTF-8\
+    LANG=C.UTF-8
+# create new user without this, all result generated from this container require sudo permission. 
+RUN useradd -ms /bin/sh gatheluck
+USER gatheluck
+RUN mkdir -p /home/gatheluck/code/src/ \
+    && mkdir -p /home/gatheluck/vender/
 
-WORKDIR ${APPLICATION_DIRECTORY}
+# install MMCV
+RUN pip install --user mmcv-full==1.3.14 -f https://download.openmmlab.com/mmcv/dist/cu101/torch1.6.0/index.html
+
+# install MMDetection
+# mmdetection is downloaded under /home/gatheluck/vender/mmdetection.
+RUN conda clean --all
+RUN git clone https://github.com/open-mmlab/mmdetection.git /home/gatheluck/vender/mmdetection
+WORKDIR /home/gatheluck/vender/mmdetection
+ENV FORCE_CUDA="1"
+RUN pip install --user -r requirements/build.txt
+RUN pip install --user --no-cache-dir -e .
+
+WORKDIR /home/gatheluck/code/
+COPY --chown=gatheluck:gatheluck requirements.txt Makefile pyproject.toml .flake8 ./
+RUN pip install --user --upgrade pip \
+    && pip install --user -r requirements.txt
+
+COPY --chown=gatheluck:gatheluck src src
+COPY --chown=gatheluck:gatheluck tests tests
