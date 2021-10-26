@@ -4,46 +4,56 @@
 # when we use nvidia/cuda:11.0-devel-ubuntu20.04 as base dockerfile,
 # we hit following error:
 # - https://github.com/open-mmlab/mmdetection/issues/1893
-# we also try set FORCE_CUDA https://github.com/open-mmlab/mmdetection/pull/2097 ,
-# it does not work.
 
-ARG PYTORCH="1.6.0"
-ARG CUDA="10.1"
-ARG CUDNN="7"
+ARG PYTORCH="1.9.0"
+ARG CUDA="11.1"
+ARG CUDNN="8"
 
 FROM pytorch/pytorch:${PYTORCH}-cuda${CUDA}-cudnn${CUDNN}-devel
 
-ENV TORCH_CUDA_ARCH_LIST="6.0 6.1 7.0+PTX"
-ENV TORCH_NVCC_FLAGS="-Xfatbin -compress-all"
-ENV CMAKE_PREFIX_PATH="$(dirname $(which conda))/../"
+# FORCE_CUDA is needed to build mmcv+onnx+gpu mode.
+ENV TORCH_CUDA_ARCH_LIST="6.0 6.1 7.0+PTX" \
+    TORCH_NVCC_FLAGS="-Xfatbin -compress-all" \
+    CMAKE_PREFIX_PATH="$(dirname $(which conda))/../" \
+    FORCE_CUDA="1" \
+    LC_ALL="C.UTF-8" \
+    LANG="C.UTF-8" \
+    PATH="/home/gatheluck/.local/bin:$PATH" \
+    PYTHONPATH="/home/gatheluck/code/"
 
 RUN apt-get update \
-    && apt-get install -y ffmpeg libsm6 libxext6 git ninja-build libglib2.0-0 libsm6 libxrender-dev libxext6 \
+    && apt-get install -y ffmpeg libsm6 libxext6 git wget ninja-build libglib2.0-0 libsm6 libxrender-dev libxext6 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-ENV PYTHONPATH="/home/gatheluck/code/"\
-    PATH="/home/gatheluck/.local/bin:$PATH"\
-    LC_ALL=C.UTF-8\
-    LANG=C.UTF-8
 # create new user without this, all result generated from this container require sudo permission. 
-RUN useradd -ms /bin/sh gatheluck
-USER gatheluck
-RUN mkdir -p /home/gatheluck/code/src/ \
-    && mkdir -p /home/gatheluck/vender/
+RUN useradd -ms /bin/sh gatheluck \
+    && mkdir -p /home/gatheluck/code/src/ \
+    && mkdir -p /home/gatheluck/vender/ 
 
-# install MMCV
-RUN pip install --user mmcv-full==1.3.14 -f https://download.openmmlab.com/mmcv/dist/cu101/torch1.6.0/index.html
+# install MMCV with ONNXRUNTIME GPU
+# we have to follow official instruction: https://github.com/open-mmlab/mmcv/blob/master/docs/deployment/onnxruntime_op.md/#how-to-build-custom-operators-for-onnx-runtime
+WORKDIR /home/gatheluck/vender/
+RUN git clone https://github.com/open-mmlab/mmcv.git \
+    && wget https://github.com/microsoft/onnxruntime/releases/download/v1.9.0/onnxruntime-linux-x64-gpu-1.9.0.tgz \
+    && tar -zxvf onnxruntime-linux-x64-gpu-1.9.0.tgz \
+    && rm -rf onnxruntime-linux-x64-gpu-1.9.0.tgz \
+    && pip install onnxruntime-gpu
+ENV ONNXRUNTIME_DIR="/home/gatheluck/vender/onnxruntime-linux-x64-gpu-1.9.0"
+ENV LD_LIBRARY_PATH="${ONNXRUNTIME_DIR}/lib:${LD_LIBRARY_PATH}"
+
+WORKDIR /home/gatheluck/vender/mmcv
+RUN MMCV_WITH_OPS=1 MMCV_WITH_ORT=1 python setup.py develop
 
 # install MMDetection
 # mmdetection is downloaded under /home/gatheluck/vender/mmdetection.
 RUN conda clean --all
 RUN git clone https://github.com/open-mmlab/mmdetection.git /home/gatheluck/vender/mmdetection
 WORKDIR /home/gatheluck/vender/mmdetection
-ENV FORCE_CUDA="1"
-RUN pip install --user -r requirements/build.txt
-RUN pip install --user --no-cache-dir -e .
+RUN pip install -r requirements/build.txt \
+    && pip install --no-cache-dir -e .
 
+USER gatheluck
 WORKDIR /home/gatheluck/code/
 COPY --chown=gatheluck:gatheluck requirements.txt Makefile pyproject.toml .flake8 ./
 RUN pip install --user --upgrade pip \
