@@ -1,0 +1,15 @@
+defaults:
+  - override hydra/job_logging: colorlog
+  - override hydra/hydra_logging: colorlog
+  - _self_
+
+hydra:
+  run:
+    dir: outputs/${hydra.job.name}/${now:%Y-%m-%d_%H-%M-%S}
+
+input_height: 608
+input_width: 608
+is_dynamic_export: true
+mmcv_train_config_path: src/config/mmdetection/train.py
+checkpoint_path: ???
+image_path: ???
