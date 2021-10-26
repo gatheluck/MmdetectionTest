@@ -10,7 +10,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
     steps:
     - uses: actions/checkout@v2
     - run: pwd && docker-compose --version && docker --version
@@ -24,9 +24,6 @@ jobs:
     # However, the directory made by actions/checkout does not allow write
     # chmod is needed to resolve above problem
     - run: chmod 777 .
-
-    - run: docker-compose exec -T mmdetection_test poetry install --no-interaction
-      working-directory: ${{ env.DOCKER_COMPOSE_DIRECTORY }}
 
     - run: docker-compose exec -T mmdetection_test make black
       working-directory: ${{ env.DOCKER_COMPOSE_DIRECTORY }}

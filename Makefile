@@ -2,31 +2,31 @@ TEST-WORKERS=2
 
 .PHONY: black
 black:
-	poetry run black --check src tests
+	black --check src tests
 
 .PHONY: black-lint
 black-lint:
-	poetry run black src tests
+	black src tests
 
 .PHONY: flake8
 flake8:
-	poetry run flake8 src tests
+	flake8 src tests
 
 .PHONY: isort
 isort:
-	poetry run isort --check-only src tests
+	isort --check-only src tests
 
 .PHONY: isort-lint
 isort-lint:
-	poetry run isort src tests
+	isort src tests
 
 .PHONY: mypy
 mypy:
-	poetry run mypy src
+	mypy src
 
 .PHONY: test
 test:
-	poetry run pytest tests --cov=src --cov-report term-missing --durations 5
+	pytest tests --cov=src --cov-report term-missing --durations 5
 
 .PHONY: lint
 lint:

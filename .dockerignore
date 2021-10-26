@@ -1,1 +1,6 @@
+.coverage
+.venv
+.vscode
 data
+outputs
+tmp

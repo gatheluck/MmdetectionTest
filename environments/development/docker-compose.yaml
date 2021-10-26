@@ -9,9 +9,9 @@ services:
     build: 
       context: ../../
       dockerfile: environments/development/Dockerfile-core
-      args:
-        PYTHON_VERSION: 3.6
-        APPLICATION_DIRECTORY: /mmdetection_test
+      # args:
+        # PYTHON_VERSION: 3.6
+        # APPLICATION_DIRECTORY: /mmdetection_test
     shm_size: 24G
     ports:
       - 3001:3001
@@ -19,4 +19,5 @@ services:
     tty: true
     user: 1000:1000
     volumes:
-      - ../../../mmdetection_test:/mmdetection_test
+      - ../../../mmdetection_test:/home/gatheluck/code
+      - ../../../detection_data:/volume/detection_data
