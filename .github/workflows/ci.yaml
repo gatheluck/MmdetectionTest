@@ -10,7 +10,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
     steps:
     - uses: actions/checkout@v2
     - run: pwd && docker-compose --version && docker --version
