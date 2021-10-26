@@ -27,12 +27,14 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # create new user without this, all result generated from this container require sudo permission. 
-RUN useradd -ms /bin/sh gatheluck \
-    && mkdir -p /home/gatheluck/code/src/ \
+RUN useradd -ms /bin/sh gatheluck
+USER gatheluck
+RUN mkdir -p /home/gatheluck/code/src/ \
     && mkdir -p /home/gatheluck/vender/ 
 
 # install MMCV with ONNXRUNTIME GPU
 # we have to follow official instruction: https://github.com/open-mmlab/mmcv/blob/master/docs/deployment/onnxruntime_op.md/#how-to-build-custom-operators-for-onnx-runtime
+USER root
 WORKDIR /home/gatheluck/vender/
 RUN git clone https://github.com/open-mmlab/mmcv.git \
     && wget https://github.com/microsoft/onnxruntime/releases/download/v1.9.0/onnxruntime-linux-x64-gpu-1.9.0.tgz \
