@@ -39,3 +39,21 @@ Python training script placed under `src/scripts/train.py` requires StrawDI data
     data/strawdi/annotations/val.json
     data/strawdi/annotations/train.json
     ```
+
+## Usage
+
+### Convert trainined model from Pytorch to ONNX
+
+```bash
+% python src/scripts/pytorch2onnx.py \
+    checkpoint_path=${PATH_TO_CHECKPOINT} \
+    image_path=${PATH_TO_SAMPLE_IMAGE}
+```
+
+### Predict by ONNX model
+
+```bash
+% python src/scripts/predict.py \
+    checkpoint_path=${PATH_TO_ONNX_CHECKPOINT} \
+    test_image_dir=${PATH_TO_DIR_IMAGES_ARE_PLACED}
+```

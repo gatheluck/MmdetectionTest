@@ -4,7 +4,7 @@ Run prediction by pretrained ONNX MM Detection detector.
 Detected Bounding boxes are overrayed to input images.
 
 Usage:
-    $ python src/scripts/predict.py \
+    $ python src/scripts/predict_onnx.py \
         checkpoint_path=${PATH_TO_ONNX_CHECKPOINT} \
         test_image_dir=${PATH_TO_DIR_IMAGES_ARE_PLACED}
 
