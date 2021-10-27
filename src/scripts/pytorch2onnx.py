@@ -1,3 +1,13 @@
+"""
+
+Convert pretrined MM Detection detector to ONNX model.
+
+Usage:
+    $ python src/scripts/pytorch2onnx.py \
+        checkpoint_path=${PATH_TO_CHECKPOINT} \
+        image_path=${PATH_TO_IMAGE_USED_TO_DEFINE_INPUT_INFO}
+
+"""
 import logging
 import pathlib
 import sys
